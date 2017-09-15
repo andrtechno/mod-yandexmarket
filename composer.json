@@ -1,0 +1,21 @@
+{
+    "name": "panix/mod-yandexmarket",
+    "description": "Module yandexmarket",
+    "keywords": ["corner-cms", "module", "yandexmarket"],
+    "homepage": "https://github.com/andrtechno/mod-yandexmarket",
+    "type": "yii2-extension",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "CORNER CMS",
+            "email": "dev@corner-cms.com",
+            "homepage": "http://www.corner-cms.com/"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "panix\\mod\\yandexmarket\\": ""
+        }
+    }
+}
