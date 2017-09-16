@@ -4,8 +4,8 @@ namespace panix\mod\yandexmarket\components;
 
 use Yii;
 use panix\engine\Html;
-use panix\mod\shop\models\ShopCategory;
-use panix\mod\shop\models\ShopProduct;
+use panix\mod\shop\models\Category;
+use panix\mod\shop\models\Product;
 use yii\helpers\Url;
 /**
  * Exports products catalog to YML format.
@@ -114,7 +114,7 @@ class YandexMarketXML {
      * Write categories to xm file
      */
     public function renderCategories() {
-        $categories = ShopCategory::findOne(1)->children()->all();
+        $categories = Category::findOne(1)->children()->all();
         //print_r($categories);die;
         $this->write('<categories>');
         foreach ($categories as $c) {
@@ -133,13 +133,13 @@ class YandexMarketXML {
      */
     public function loadProducts() {
         $limit = $this->limit;
-        $total = ceil(ShopProduct::find()->published()->count() / $limit);
+        $total = ceil(Product::find()->published()->count() / $limit);
         $offset = 0;
 
         $this->write('<offers>');
 
         for ($i = 0; $i <= $total; ++$i) {
-            $products = ShopProduct::find(['limit' => $limit,
+            $products = Product::find(['limit' => $limit,
                 'offset' => $offset])->published()->all();
             $this->renderProducts($products);
 
@@ -178,7 +178,7 @@ class YandexMarketXML {
                     //TODO: need test product with variants
                     $this->renderOffer($p, array(
                         'url' => Url::to($p->getUrl() . $hashtag,true),
-                        'price' => Yii::$app->currency->convert(ShopProduct::calculatePrices($p, $p->variants, 0), $this->_config['currency_id']),
+                        'price' => Yii::$app->currency->convert(Product::calculatePrices($p, $p->variants, 0), $this->_config['currency_id']),
                         'currencyId' => $this->currencyIso,
                         'categoryId' => ($p->mainCategory)?$p->mainCategory->id:false,
                        // 'picture' => $p->image ? Yii::$app->urlManager->createAbsoluteUrl($p->getMainImageUrl('100x100')) : null,
@@ -191,10 +191,10 @@ class YandexMarketXML {
     }
 
     /**
-     * @param ShopProduct $p
+     * @param Product $p
      * @param array $data
      */
-    public function renderOffer(ShopProduct $p, array $data) {
+    public function renderOffer(Product $p, array $data) {
         $available = ($p->availability == 1) ? 'true' : 'false';
         $this->write('<offer id="' . $p->id . '" available="' . $available . '">');
 
