@@ -1,8 +1,10 @@
 <?php
 
-Yii::import('mod.shop.ShopModule');
+namespace panix\mod\yandexmarket\controllers;
 
-class DefaultController extends Controller {
+use panix\mod\yandexmarket\components\YandexMarketXML;
+
+class DefaultController extends \panix\engine\controllers\WebController {
 
     public function actionIndex() {
         $xml = new YandexMarketXML;

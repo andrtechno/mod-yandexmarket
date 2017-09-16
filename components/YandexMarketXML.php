@@ -1,7 +1,11 @@
 <?php
 
-Yii::import('mod.shop.models.ShopCategory');
+namespace panix\mod\yandexmarket\components;
 
+use Yii;
+use panix\engine\Html;
+use panix\mod\shop\models\ShopCategory;
+use panix\mod\shop\models\ShopProduct;
 /**
  * Exports products catalog to YML format.
  */
@@ -25,7 +29,7 @@ class YandexMarketXML {
     /**
      * @var string
      */
-    public $cacheDir = 'application.runtime';
+    public $cacheDir = '@runtime';
 
     /**
      * @var int
@@ -46,15 +50,15 @@ class YandexMarketXML {
      * Initialize component
      */
     public function __construct() {
-        $this->_config = Yii::app()->settings->get('yandexMarket');
-        $this->currencyIso = Yii::app()->currency->getMain()->iso;
+        $this->_config = Yii::$app->settings->get('yandexmarket');
+        $this->currencyIso = Yii::$app->currency->getMain()->iso;
     }
 
     /**
      * Display xml file
      */
     public function processRequest() {
-        $cache = Yii::app()->cache;
+        $cache = Yii::$app->cache;
         $check = $cache->get($this->cacheFileName);
         if ($check === false) {
             $this->createXmlFile();
@@ -109,14 +113,14 @@ class YandexMarketXML {
      * Write categories to xm file
      */
     public function renderCategories() {
-        $categories = ShopCategory::model()->excludeRoot()->findAll();
+        $categories = ShopCategory::find()->excludeRoot()->all();
         $this->write('<categories>');
         foreach ($categories as $c) {
             $parentId = null;
             $parent = $c->parent(); //getparent()
             if ($parent && $parent->id != 1)
                 $parentId = 'parentId="' . $parent->id . '"';
-            $this->write('<category id="' . $c->id . '" ' . $parentId . '>' . CHtml::encode($c->name) . '</category>');
+            $this->write('<category id="' . $c->id . '" ' . $parentId . '>' . Html::encode($c->name) . '</category>');
         }
         $this->write('</categories>');
     }
@@ -126,16 +130,14 @@ class YandexMarketXML {
      */
     public function loadProducts() {
         $limit = $this->limit;
-        $total = ceil(ShopProduct::model()->published()->count() / $limit);
+        $total = ceil(ShopProduct::find()->published()->count() / $limit);
         $offset = 0;
 
         $this->write('<offers>');
 
         for ($i = 0; $i <= $total; ++$i) {
-            $products = ShopProduct::model()->published()->findAll(array(
-                'limit' => $limit,
-                'offset' => $offset,
-            ));
+            $products = ShopProduct::find()->where(['limit' => $limit,
+                'offset' => $offset])->published()->all();
             $this->renderProducts($products);
 
             $offset+=$limit;
@@ -152,10 +154,10 @@ class YandexMarketXML {
             if (!count($p->variants)) {
                 $this->renderOffer($p, array(
                     'url' => $p->getAbsoluteUrl(),
-                    'price' => Yii::app()->currency->convert($p->price, $this->_config['currency_id']),
+                    'price' => Yii::$app->currency->convert($p->price, $this->_config['currency_id']),
                     'currencyId' => $this->currencyIso,
                     'categoryId' => ($p->mainCategory)?$p->mainCategory->id:false,
-                    'picture' => $p->getMainImageUrl('100x100') ? Yii::app()->createAbsoluteUrl($p->getMainImageUrl('100x100')) : null,
+                    'picture' => $p->getMainImageUrl('100x100') ? Yii::$app->createAbsoluteUrl($p->getMainImageUrl('100x100')) : null,
                     'name' => CHtml::encode($p->name),
                     'description' => $this->clearText($p->short_description),
                 ));
@@ -171,11 +173,11 @@ class YandexMarketXML {
 
                     $this->renderOffer($p, array(
                         'url' => $p->getAbsoluteUrl() . $hashtag,
-                        'price' => Yii::app()->currency->convert(ShopProduct::calculatePrices($p, $p->variants, 0), $this->_config['currency_id']),
+                        'price' => Yii::$app->currency->convert(ShopProduct::calculatePrices($p, $p->variants, 0), $this->_config['currency_id']),
                         'currencyId' => $this->currencyIso,
                         'categoryId' => ($p->mainCategory)?$p->mainCategory->id:false,
-                        'picture' => $p->image ? Yii::app()->createAbsoluteUrl($p->getMainImageUrl('100x100')) : null,
-                        'name' => CHtml::encode($name),
+                        'picture' => $p->image ? Yii::$app->urlManager->createAbsoluteUrl($p->getMainImageUrl('100x100')) : null,
+                        'name' => Html::encode($name),
                         'description' => $this->clearText($p->short_description),
                     ));
                 }
@@ -202,14 +204,14 @@ class YandexMarketXML {
      * @return string
      */
     public function clearText($text) {
-        return CHtml::encode(strip_tags($text));
+        return Html::encode(strip_tags($text));
     }
 
     /**
      * @return string
      */
     public function getXmlFileFullPath() {
-        return Yii::getPathOfAlias($this->cacheDir) . DIRECTORY_SEPARATOR . $this->cacheFileName;
+        return Yii::getAlias($this->cacheDir) . DIRECTORY_SEPARATOR . $this->cacheFileName;
     }
 
     /**

@@ -1,76 +1,40 @@
 <?php
+namespace panix\mod\yandexmarket;
+use Yii;
+class Module extends \panix\engine\WebModule {
 
-/**
- * Модуль импорта товаров в ЯндексМаркет
- * 
- * @author CORNER CMS development team <dev@corner-cms.com>
- * @license http://corner-cms.com/license.txt CORNER CMS License
- * @link http://corner-cms.com CORNER CMS
- * @package modules
- * @subpackage commerce.yandexmarket
- * @uses WebModule
- */
-class YandexMarketModule extends WebModule {
-
-    public function init() {
-        $this->setImport(array(
-            $this->id . '.models.*',
-            $this->id . '.components.*',
-        ));
-        $this->setIcon('icon-yandex');
-    }
-
-    /**
-     * Установка модуля
-     * @return boolean
-     */
-    public function afterInstall() {
-        if (Yii::app()->hasModule('shop')) {
-            if (Yii::app()->hasComponent('settings'))
-                Yii::app()->settings->set('yandexMarket', SettingsYandexMarketForm::defaultSettings());
-            return parent::afterInstall();
-        } else {
-            Yii::app()->controller->setNotify('Ошибка, Модуль интернет-магазин не устрановлен.', 'error');
-            return false;
-        }
-    }
-
-    /**
-     * Удаление модуля
-     * @return boolean
-     */
-    public function afterUninstall() {
-        Yii::app()->settings->clear('yandexMarket');
-        return parent::afterUninstall();
-    }
-
-    public function getRules() {
-        return array(
-            '/yandex-market.xml' => '/yandexMarket/default/index',
-        );
-    }
+    public $icon = 'yandex';
+    public $routes = [
+        'yandex-market.xml' => 'yandexmarket/default/index',
+    ];
 
     public function getAdminMenu() {
         return array(
             'shop' => array(
                 'items' => array(
                     array(
-                        'label' => $this->name,
-                        'url' => $this->adminHomeUrl,
-                        'active' => $this->getIsActive('yandexMarket/default'),
-                        'icon' => Html::icon($this->icon),
-                        'visible' => Yii::app()->user->openAccess(array('YandexMarket.Default.*','YandexMarket.Default.Index')),
+                        'label' => Yii::t('yandexmarket/default', 'MODULE_NAME'),
+                        'url' => ['/admin/yandexmarket'],
+                        'icon' => $this->icon,
                     ),
                 ),
             ),
         );
     }
 
-    public function getAdminSidebarMenu() {
-        Yii::import('mod.admin.widgets.EngineMainMenu');
-        $mod = new EngineMainMenu;
+    public function getAdminSidebar() {
+        $mod = new \panix\engine\widgets\nav\Nav;
         $items = $mod->findMenu('shop');
         return $items['items'];
     }
-
+    public function getInfo() {
+        return [
+            'label' => Yii::t('yandexmarket/default', 'MODULE_NAME'),
+            'author' => 'andrew.panix@gmail.com',
+            'version' => '1.0',
+            'icon' => 'icon-1c',
+            'description' => Yii::t('yandexmarket/default', 'MODULE_DESC'),
+            'url' => ['/admin/yandexmarket'],
+        ];
+    }
 }
