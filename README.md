@@ -1,8 +1,8 @@
-mod-sitemap
+mod-yandexmarket
 ===========
-Module for sitemap.xml CORNER CMS
+Module for yandexmarket CORNER CMS
 
-[![Latest Stable Version](https://poser.pugx.org/panix/mod-sitemap/v/stable)](https://packagist.org/packages/panix/mod-sitemap) [![Total Downloads](https://poser.pugx.org/panix/mod-sitemap/downloads)](https://packagist.org/packages/panix/mod-sitemap) [![Monthly Downloads](https://poser.pugx.org/panix/mod-sitemap/d/monthly)](https://packagist.org/packages/panix/mod-sitemap) [![Daily Downloads](https://poser.pugx.org/panix/mod-sitemap/d/daily)](https://packagist.org/packages/panix/mod-sitemap) [![Latest Unstable Version](https://poser.pugx.org/panix/mod-sitemap/v/unstable)](https://packagist.org/packages/panix/mod-sitemap) [![License](https://poser.pugx.org/panix/mod-sitemap/license)](https://packagist.org/packages/panix/mod-sitemap)
+[![Latest Stable Version](https://poser.pugx.org/panix/mod-yandexmarket/v/stable)](https://packagist.org/packages/panix/mod-yandexmarket) [![Total Downloads](https://poser.pugx.org/panix/mod-yandexmarket/downloads)](https://packagist.org/packages/panix/mod-yandexmarket) [![Monthly Downloads](https://poser.pugx.org/panix/mod-yandexmarket/d/monthly)](https://packagist.org/packages/panix/mod-yandexmarket) [![Daily Downloads](https://poser.pugx.org/panix/mod-yandexmarket/d/daily)](https://packagist.org/packages/panix/mod-yandexmarket) [![Latest Unstable Version](https://poser.pugx.org/panix/mod-yandexmarket/v/unstable)](https://packagist.org/packages/panix/mod-yandexmarket) [![License](https://poser.pugx.org/panix/mod-yandexmarket/license)](https://packagist.org/packages/panix/mod-yandexmarket)
 
 
 Installation
@@ -13,13 +13,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require --prefer-dist panix/mod-sitemap "*"
+php composer.phar require --prefer-dist panix/mod-yandexmarket "*"
 ```
 
 or add
 
 ```
-"panix/mod-sitemap": "*"
+"panix/mod-yandexmarket": "*"
 ```
 
 to the require section of your `composer.json` file.
@@ -27,11 +27,7 @@ to the require section of your `composer.json` file.
 Add to web config.
 ```
 'modules' => [
-    'sitemap' => ['class' => 'panix\mod\sitemap\Module'],
+    'yandexmarket' => ['class' => 'panix\mod\yandexmarket\Module'],
 ],
 ```
 
-Run
-```
-http://example.com/sitemap.xml
-```
