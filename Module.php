@@ -32,7 +32,7 @@ class Module extends \panix\engine\WebModule {
             'label' => Yii::t('yandexmarket/default', 'MODULE_NAME'),
             'author' => 'andrew.panix@gmail.com',
             'version' => '1.0',
-            'icon' => 'icon-1c',
+            'icon' => $this->icon,
             'description' => Yii::t('yandexmarket/default', 'MODULE_DESC'),
             'url' => ['/admin/yandexmarket'],
         ];
