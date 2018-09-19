@@ -10,11 +10,11 @@ $form = ActiveForm::begin([
 
         ]);
 ?>
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?= $this->context->pageName ?></h3>
+<div class="card bg-light">
+    <div class="card-header">
+        <h5><?= $this->context->pageName ?></h5>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
         <?= $form->field($model, 'name')->hint($model::t('HINT_NAME')); ?>
         <?= $form->field($model, 'company')->hint($model::t('HINT_COMPANY')); ?>
         <?= $form->field($model, 'url')->hint($model::t('HINT_URL')); ?>
@@ -22,7 +22,7 @@ $form = ActiveForm::begin([
 
 
     </div>
-    <div class="panel-footer text-center">
+    <div class="card-footer text-center">
 
         <?= Html::submitButton(Html::icon('check') . ' ' . Yii::t('app', 'SAVE'), ['class' => 'btn btn-success']) ?>
         <?= Html::a('das',[''],['class'=>'btn btn-default']); ?>
