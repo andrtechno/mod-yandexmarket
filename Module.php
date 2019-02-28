@@ -1,14 +1,19 @@
 <?php
+
 namespace panix\mod\yandexmarket;
+
 use Yii;
-class Module extends \panix\engine\WebModule {
+
+class Module extends \panix\engine\WebModule
+{
 
     public $icon = 'yandex';
     public $routes = [
         'yandex-market.xml' => 'yandexmarket/default/index',
     ];
 
-    public function getAdminMenu() {
+    public function getAdminMenu()
+    {
         return array(
             'shop' => array(
                 'items' => array(
@@ -22,12 +27,15 @@ class Module extends \panix\engine\WebModule {
         );
     }
 
-    public function getAdminSidebar() {
+    public function getAdminSidebar()
+    {
         $mod = new \panix\engine\bootstrap\Nav;
         $items = $mod->findMenu('shop');
         return $items['items'];
     }
-    public function getInfo() {
+
+    public function getInfo()
+    {
         return [
             'label' => Yii::t('yandexmarket/default', 'MODULE_NAME'),
             'author' => 'andrew.panix@gmail.com',
