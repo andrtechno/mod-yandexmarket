@@ -3,8 +3,9 @@
 namespace panix\mod\yandexmarket;
 
 use Yii;
+use panix\engine\WebModule;
 
-class Module extends \panix\engine\WebModule
+class Module extends WebModule
 {
 
     public $icon = 'yandex';
@@ -19,7 +20,7 @@ class Module extends \panix\engine\WebModule
                 'items' => array(
                     array(
                         'label' => Yii::t('yandexmarket/default', 'MODULE_NAME'),
-                        'url' => ['/admin/yandexmarket'],
+                        'url' => ['/yandexmarket'],
                         'icon' => $this->icon,
                     ),
                 ),
@@ -42,7 +43,7 @@ class Module extends \panix\engine\WebModule
             'version' => '1.0',
             'icon' => $this->icon,
             'description' => Yii::t('yandexmarket/default', 'MODULE_DESC'),
-            'url' => ['/admin/yandexmarket'],
+            'url' => ['/yandexmarket'],
         ];
     }
 }
