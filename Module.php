@@ -30,9 +30,7 @@ class Module extends WebModule
 
     public function getAdminSidebar()
     {
-        $mod = new \panix\engine\bootstrap\Nav;
-        $items = $mod->findMenu('shop');
-        return $items['items'];
+        return (new \panix\engine\bootstrap\BackendNav)->findMenu('shop')['items'];
     }
 
     public function getInfo()
