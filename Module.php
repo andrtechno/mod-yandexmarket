@@ -15,17 +15,21 @@ class Module extends WebModule
 
     public function getAdminMenu()
     {
-        return array(
-            'shop' => array(
-                'items' => array(
-                    array(
-                        'label' => Yii::t('yandexmarket/default', 'MODULE_NAME'),
-                        'url' => ['/yandexmarket'],
-                        'icon' => $this->icon,
-                    ),
-                ),
-            ),
-        );
+        return [
+            'shop' => [
+                'items' => [
+                    'integration' => [
+                        'items' => [
+                            [
+                                'label' => Yii::t('yandexmarket/default', 'MODULE_NAME'),
+                                'url' => ['/yandexmarket'],
+                                'icon' => $this->icon,
+                            ],
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 
     public function getAdminSidebar()
