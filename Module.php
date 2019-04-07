@@ -22,7 +22,7 @@ class Module extends WebModule
                         'items' => [
                             [
                                 'label' => Yii::t('yandexmarket/default', 'MODULE_NAME'),
-                                'url' => ['/yandexmarket'],
+                                'url' => ['/admin/yandexmarket'],
                                 'icon' => $this->icon,
                             ],
                         ]
@@ -45,7 +45,7 @@ class Module extends WebModule
             'version' => '1.0',
             'icon' => $this->icon,
             'description' => Yii::t('yandexmarket/default', 'MODULE_DESC'),
-            'url' => ['/yandexmarket'],
+            'url' => ['/admin/yandexmarket'],
         ];
     }
 }
