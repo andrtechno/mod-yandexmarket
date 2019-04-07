@@ -2,6 +2,8 @@
 
 namespace panix\mod\yandexmarket\components;
 
+
+use panix\mod\shop\components\AttributeData;
 use Yii;
 use panix\engine\Html;
 use panix\mod\shop\models\Category;
@@ -139,8 +141,12 @@ class YandexMarketXML {
         $this->write('<offers>');
 
         for ($i = 0; $i <= $total; ++$i) {
-            $products = Product::find(['limit' => $limit,
-                'offset' => $offset])->published()->all();
+            $products = Product::find()
+                //->where(['limit' => $limit, 'offset' => $offset])
+                ->limit($limit)
+                ->offset($offset)
+                ->published()
+                ->all();
             $this->renderProducts($products);
 
             $offset+=$limit;
@@ -153,18 +159,13 @@ class YandexMarketXML {
      * @param array $products
      */
     public function renderProducts(array $products) {
-        //TODO no support placehoder image;
+        $data=[];
         foreach ($products as $p) {
             if (!count($p->variants)) {
-                $this->renderOffer($p, array(
-                    'url' => Url::to($p->getUrl(),true),
-                    'price' => Yii::$app->currency->convert($p->price, $this->_config['currency_id']),
-                    'currencyId' => $this->currencyIso,
-                    'categoryId' => ($p->mainCategory)?$p->mainCategory->id:false,
-                   // 'picture' => $p->getMainImageUrl('100x100') ? Yii::$app->urlManager->createAbsoluteUrl($p->getMainImageUrl('100x100')) : null,
-                    'name' => Html::encode($p->name),
-                    'description' => $this->clearText($p->full_description),
-                ));
+
+                $data['url'] = Url::to($p->getUrl(),true);
+                $data['price'] = Yii::$app->currency->convert($p->price, $this->_config['currency_id']);
+                $data['name'] = Html::encode($p->name);
             } else {
 
                 foreach ($p->variants as $v) {
@@ -176,17 +177,27 @@ class YandexMarketXML {
 
                     $hashtag = '#' . $v->productAttribute->name . ':' . $v->option->id;
                     //TODO: need test product with variants
-                    $this->renderOffer($p, array(
-                        'url' => Url::to($p->getUrl() . $hashtag,true),
-                        'price' => Yii::$app->currency->convert(Product::calculatePrices($p, $p->variants, 0), $this->_config['currency_id']),
-                        'currencyId' => $this->currencyIso,
-                        'categoryId' => ($p->mainCategory)?$p->mainCategory->id:false,
-                       // 'picture' => $p->image ? Yii::$app->urlManager->createAbsoluteUrl($p->getMainImageUrl('100x100')) : null,
-                        'name' => Html::encode($name),
-                        'description' => $this->clearText($p->short_description),
-                    ));
+                    $data['url'] = Url::to($p->getUrl(),true).$hashtag;
+                    $data['price'] = Yii::$app->currency->convert(Product::calculatePrices($p, $p->variants, 0), $this->_config['currency_id']);
+                    $data['name'] = Html::encode($name);
                 }
             }
+            //Common options
+            $data['categoryId'] = ($p->mainCategory) ? $p->mainCategory->id : false;
+            $data['picture'] = $p->getImage() ? Url::to($p->getMainImage('100x100')->url,true) : null;
+            $data['vendor'] = ($p->manufacturer) ? $p->manufacturer->name : false;
+            $data['currencyId'] = $this->currencyIso;
+            if(!empty($p->full_description)){
+                $data['description'] = $this->clearText($p->full_description);
+            }
+            $attribute = new AttributeData($p);
+            $test = $attribute->getData();
+
+            foreach($test as $a){
+                $data['param'][$a->name] = $a->value;
+            }
+
+            $this->renderOffer($p, $data);
         }
     }
 
@@ -198,9 +209,14 @@ class YandexMarketXML {
         $available = ($p->availability == 1) ? 'true' : 'false';
         $this->write('<offer id="' . $p->id . '" available="' . $available . '">');
 
-        foreach ($data as $key => $val){
-
-            $this->write("<$key>" . $val . "</$key>\n");
+        foreach ($data as $key => $val) {
+            if(is_array($val)){
+                foreach($val as $name=>$value){
+                    $this->write("<param name=\"".$name."\">" . $value . "</param>\n");
+                }
+            }else{
+                $this->write("<$key>" . $val . "</$key>\n");
+            }
         }
         $this->write('</offer>' . "\n");
     }
@@ -210,7 +226,7 @@ class YandexMarketXML {
      * @return string
      */
     public function clearText($text) {
-        return Html::encode(strip_tags($text));
+        return '<![CDATA['  . $text  . ']]>';
     }
 
     /**
