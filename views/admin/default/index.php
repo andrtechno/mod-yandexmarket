@@ -23,9 +23,7 @@ $form = ActiveForm::begin([
 
     </div>
     <div class="card-footer text-center">
-
-        <?= Html::submitButton(Html::icon('check') . ' ' . Yii::t('app', 'SAVE'), ['class' => 'btn btn-success']) ?>
-        <?= Html::a('das',[''],['class'=>'btn btn-default']); ?>
+        <?= $model->submitButton(); ?>
     </div>
 </div>
 <?php ActiveForm::end(); ?>

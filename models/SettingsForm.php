@@ -1,7 +1,12 @@
 <?php
+
 namespace panix\mod\yandexmarket\models;
+
 use Yii;
-class SettingsForm extends \panix\engine\SettingsModel {
+use panix\engine\SettingsModel;
+
+class SettingsForm extends SettingsModel
+{
 
     protected $module = 'yandexmarket';
 
@@ -10,16 +15,18 @@ class SettingsForm extends \panix\engine\SettingsModel {
     public $url;
     public $currency_id;
 
-    public static function defaultSettings() {
-        return array(
+    public static function defaultSettings()
+    {
+        return [
             'name' => Yii::$app->settings->get('app', 'site_name'),
             'company' => 'Демо кампания',
             'url' => Yii::$app->request->hostInfo,
             'currency_id' => null,
-        );
+        ];
     }
 
-    public function validateCurrency() {
+    public function validateCurrency()
+    {
         $currencies = Yii::$app->currency->getCurrencies();
         if (count($currencies)) {
             if (!array_key_exists($this->currency_id, $currencies))
@@ -27,7 +34,8 @@ class SettingsForm extends \panix\engine\SettingsModel {
         }
     }
 
-    public function rules() {
+    public function rules()
+    {
         return [
             ['currency_id', 'validateCurrency'],
             [['name', 'company', 'url'], 'string'],
@@ -35,7 +43,8 @@ class SettingsForm extends \panix\engine\SettingsModel {
         ];
     }
 
-    public function getCurrencies() {
+    public function getCurrencies()
+    {
         $result = array();
         foreach (Yii::$app->currency->getCurrencies() as $id => $model)
             $result[$id] = $model->name;
