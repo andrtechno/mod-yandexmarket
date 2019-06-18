@@ -4,6 +4,8 @@ namespace panix\mod\yandexmarket\components;
 
 
 use panix\mod\shop\models\Attribute;
+use panix\mod\shop\models\Currency;
+use panix\mod\shop\models\Manufacturer;
 use Yii;
 use yii\helpers\Url;
 use panix\engine\Html;
@@ -52,7 +54,9 @@ class YandexMarketXML
      * @var integer
      */
     private $_config;
-    private $attributesList;
+    private $attributes;
+    private $manufacturers;
+    private $currencies;
 
     /**
      * Initialize component
@@ -61,7 +65,9 @@ class YandexMarketXML
     {
         $this->_config = Yii::$app->settings->get('yandexmarket');
         $this->currencyIso = Yii::$app->currency->getMain()->iso;
-        $this->attributesList = $this->attributesList();
+        $this->manufacturers = $this->getManufacturers();
+        $this->currencies = $this->getCurrencies();
+        $this->attributes = $this->attributesList();
     }
 
     /**
@@ -93,6 +99,13 @@ class YandexMarketXML
         $this->write("<!DOCTYPE yml_catalog SYSTEM \"shops.dtd\">\n" . PHP_EOL);
         $this->write('<yml_catalog date="' . date('Y-m-d H:i') . '">' . PHP_EOL);
         $this->write('<shop>' . PHP_EOL);
+
+
+        $this->write('<delivery-options>условия доставки</delivery-options>' . PHP_EOL);
+        $this->write('<pickup-options>условия самовывоза</pickup-options>' . PHP_EOL);
+        $this->write('<enable_auto_discount>true</enable_auto_discount>' . PHP_EOL);
+
+
         $this->renderShopData();
         $this->renderCurrencies();
         $this->renderCategories();
@@ -122,7 +135,10 @@ class YandexMarketXML
     public function renderCurrencies()
     {
         $this->write('<currencies>' . PHP_EOL);
-        $this->write('<currency id="' . $this->currencyIso . '" rate="1"/>' . PHP_EOL);
+        foreach ($this->currencies as $currency) {
+            $this->write('<currency id="' . $currency['iso'] . '" rate="' . $currency['rate'] . '"/>' . PHP_EOL);
+        }
+
         $this->write('</currencies>' . PHP_EOL);
     }
 
@@ -179,23 +195,12 @@ class YandexMarketXML
 
         $data = [];
         foreach ($products as $p) {
-            /**
-             * @var Product $p
-             */
+            /** @var Product $p */
             if (!count($p->variants)) {
 
                 $data['url'] = Url::to($p->getUrl(), true);
                 $data['price'] = Yii::$app->currency->convert($p->price, $this->_config->currency_id);
                 $data['name'] = Html::encode($p->name);
-                $data['vendor'] = ($p->manufacturer) ? $p->manufacturer->name : false;
-
-                //  $attribute = new AttributeData($p);
-                //  $test = $attribute->getData();
-                // $data['params'] = [];
-                // foreach ($test as $a) {
-                //     $data['params'][$a->name] = $a->value;
-                //}
-
 
             } else {
 
@@ -215,24 +220,31 @@ class YandexMarketXML
             }
             //Common options
             $data['categoryId'] = ($p->mainCategory) ? $p->mainCategory->id : false;
-            $data['vendor'] = ($p->manufacturer) ? $p->manufacturer->name : false;
-            $data['currencyId'] = $this->currencyIso;
-            $data['model'] = Html::encode($p->sku);
+            $data['vendor'] = ($p->manufacturer_id) ? $this->manufacturers[$p->manufacturer_id] : false;
+            if($p->currency_id){
+                $data['currencyId'] = $this->currencies[$p->currency_id]['iso'];
+            }else{
+                $data['currencyId'] = $this->currencies[1]['iso'];
+            }
+
+
+            if (!empty($p->sku))
+                $data['model'] = Html::encode($p->sku);
             if (!empty($p->full_description)) {
                 $data['description'] = $this->clearText($p->full_description);
             }
 
             foreach ($p->getEavAttributes() as $k => $a) {
-                if (isset($this->attributesList[$k]['list'][$a])) {
-                    $data['params'][$this->attributesList[$k]['name']] = $this->attributesList[$k]['list'][$a];
+
+                if (isset($this->attributes[$k]['list'][$a])) {
+                    $data['params'][$this->attributes[$k]['name']] = $this->attributes[$k]['list'][$a];
                 }
             }
 
+
             $data['images'] = [];
             foreach ($p->images as $img) {
-                /**
-                 * @var \panix\mod\images\models\Image $img
-                 */
+                /** @var \panix\mod\images\models\Image $img */
                 $data['images'][] = Url::to($img->getUrl(), true);
             }
             $this->renderOffer($p, $data);
@@ -292,9 +304,27 @@ class YandexMarketXML
         fwrite($this->fileHandler, $string);
     }
 
-    public function manufacturerList()
+    public function getManufacturers()
     {
-        return [];
+        $manufacturers = Manufacturer::find()->all();
+        $result = [];
+        foreach ($manufacturers as $manufacturer) {
+            $result[$manufacturer->id] = $manufacturer->name;
+        }
+        return $result;
+    }
+
+    public function getCurrencies()
+    {
+        $currencies = Currency::find()->orderBy(['is_main'=>SORT_DESC])->asArray()->all();
+        $result = [];
+        foreach ($currencies as $currency) {
+            $result[$currency['id']] = [
+                'rate'=>$currency['rate'],
+                'iso'=>$currency['iso']
+            ];
+        }
+        return $result;
     }
 
     public function attributesList()
@@ -309,11 +339,8 @@ class YandexMarketXML
                     $result[$attribute->name]['list'][$option->id] = $option->value;
                     $result[$attribute->name]['name'] = $attribute->title;
                 }
-
             }
         }
-        // VarDumper::dump($result, 10, true);
-        // die;
         return $result;
     }
 
