@@ -2,12 +2,15 @@
 
 namespace panix\mod\yandexmarket\components;
 
+
+use panix\mod\shop\models\Attribute;
 use Yii;
 use yii\helpers\Url;
 use panix\engine\Html;
 use panix\mod\shop\models\Category;
 use panix\mod\shop\models\Product;
 use panix\mod\shop\components\AttributeData;
+use yii\helpers\VarDumper;
 
 /**
  * Exports products catalog to YML format.
@@ -49,6 +52,7 @@ class YandexMarketXML
      * @var integer
      */
     private $_config;
+    private $attributesList;
 
     /**
      * Initialize component
@@ -57,6 +61,7 @@ class YandexMarketXML
     {
         $this->_config = Yii::$app->settings->get('yandexmarket');
         $this->currencyIso = Yii::$app->currency->getMain()->iso;
+        $this->attributesList = $this->attributesList();
     }
 
     /**
@@ -171,8 +176,12 @@ class YandexMarketXML
      */
     public function renderProducts(array $products)
     {
+
         $data = [];
         foreach ($products as $p) {
+            /**
+             * @var Product $p
+             */
             if (!count($p->variants)) {
 
                 $data['url'] = Url::to($p->getUrl(), true);
@@ -213,15 +222,18 @@ class YandexMarketXML
                 $data['description'] = $this->clearText($p->full_description);
             }
 
-            //$attribute = new AttributeData($p);
-            //$test = $attribute->getData();
+            foreach ($p->getEavAttributes() as $k => $a) {
+                if (isset($this->attributesList[$k]['list'][$a])) {
+                    $data['params'][$this->attributesList[$k]['name']] = $this->attributesList[$k]['list'][$a];
+                }
+            }
 
-            //foreach ($test as $a) {
-            ///    $data['param'][$a->name] = $a->value;
-            //}
             $data['images'] = [];
             foreach ($p->images as $img) {
-                 $data['images'][] = Url::to($img->getUrl(),true);
+                /**
+                 * @var \panix\mod\images\models\Image $img
+                 */
+                $data['images'][] = Url::to($img->getUrl(), true);
             }
             $this->renderOffer($p, $data);
         }
@@ -278,6 +290,31 @@ class YandexMarketXML
     private function write($string)
     {
         fwrite($this->fileHandler, $string);
+    }
+
+    public function manufacturerList()
+    {
+        return [];
+    }
+
+    public function attributesList()
+    {
+        $attributes = Attribute::find()->all();
+        $result = [];
+
+        foreach ($attributes as $attribute) {
+            if ($attribute->options) {
+                $result[$attribute->name] = [];
+                foreach ($attribute->options as $option) {
+                    $result[$attribute->name]['list'][$option->id] = $option->value;
+                    $result[$attribute->name]['name'] = $attribute->title;
+                }
+
+            }
+        }
+        // VarDumper::dump($result, 10, true);
+        // die;
+        return $result;
     }
 
 }
