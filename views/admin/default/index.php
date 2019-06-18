@@ -19,7 +19,7 @@ $form = ActiveForm::begin([]);
         </div>
         <div class="card-footer text-center">
             <?= $model->submitButton(); ?>
-            <?= Html::a('XML',['/yandex-market.xml'],['class'=>'btn btn-outline-primary','target'=>'_blank']); ?>
+            <?= Html::a(Yii::t('yandexmarket/default', 'VIEW_FILE'), ['/yandex-market.xml'], ['class' => 'btn btn-outline-primary', 'target' => '_blank']); ?>
         </div>
     </div>
 <?php ActiveForm::end(); ?>
