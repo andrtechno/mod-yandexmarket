@@ -199,7 +199,7 @@ class YandexMarketXML
             if (!count($p->variants)) {
 
                 $data['url'] = Url::to($p->getUrl(), true);
-                $data['price'] = Yii::$app->currency->convert($p->price, $this->_config->currency_id);
+                $data['price'] = Yii::$app->currency->convert($p->price, $p->currency_id);
                 $data['name'] = Html::encode($p->name);
 
             } else {
@@ -214,7 +214,7 @@ class YandexMarketXML
                     $hashtag = '#' . $v->productAttribute->name . ':' . $v->option->id;
                     //TODO: need test product with variants
                     $data['url'] = Url::to($p->getUrl(), true) . $hashtag;
-                    $data['price'] = Yii::$app->currency->convert(Product::calculatePrices($p, $p->variants, 0), $this->_config->currency_id);
+                    $data['price'] = Yii::$app->currency->convert(Product::calculatePrices($p, $p->variants, 0), $p->currency_id);
                     $data['name'] = Html::encode($name);
                 }
             }

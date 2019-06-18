@@ -16,9 +16,6 @@ $form = ActiveForm::begin([]);
             <?= $form->field($model, 'name')->hint($model::t('HINT_NAME')); ?>
             <?= $form->field($model, 'company')->hint($model::t('HINT_COMPANY')); ?>
             <?= $form->field($model, 'url')->hint($model::t('HINT_URL')); ?>
-            <?= $form->field($model, 'currency_id')->dropDownList($model->getCurrencies()); ?>
-
-
         </div>
         <div class="card-footer text-center">
             <?= $model->submitButton(); ?>
