@@ -2,17 +2,24 @@
 
 namespace panix\mod\yandexmarket;
 
-use panix\mod\admin\widgets\sidebar\BackendNav;
 use Yii;
+use yii\base\BootstrapInterface;
 use panix\engine\WebModule;
+use panix\mod\admin\widgets\sidebar\BackendNav;
 
-class Module extends WebModule
+class Module extends WebModule implements BootstrapInterface
 {
 
     public $icon = 'yandex';
-    public $routes = [
-        'yandex-market.xml' => 'yandexmarket/default/index',
-    ];
+
+    public function bootstrap($app)
+    {
+        $app->urlManager->addRules(
+            [
+                'yandex-market.xml' => 'yandexmarket/default/index',
+            ]
+        );
+    }
 
     public function getAdminMenu()
     {

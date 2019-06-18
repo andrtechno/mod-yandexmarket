@@ -3,9 +3,10 @@
 namespace panix\mod\yandexmarket\controllers\admin;
 
 use Yii;
+use panix\engine\controllers\AdminController;
 use panix\mod\yandexmarket\models\SettingsForm;
 
-class DefaultController extends \panix\engine\controllers\AdminController {
+class DefaultController extends AdminController {
 
     public function actionIndex() {
 
@@ -22,7 +23,7 @@ class DefaultController extends \panix\engine\controllers\AdminController {
             $model->save();
             $this->refresh();
         }
-        return $this->render('index', array('model' => $model));
+        return $this->render('index', ['model' => $model]);
     }
 
 }
