@@ -64,7 +64,7 @@ class YandexMarketXML
     public function __construct()
     {
         $this->_config = Yii::$app->settings->get('yandexmarket');
-        //$this->currencyIso = Yii::$app->currency->main->id;
+        //$this->currencyIso = Yii::$app->currency->main['id'];
         $this->manufacturers = $this->getManufacturers();
         $this->currencies = $this->getCurrencies();
         $this->attributes = $this->attributesList();
@@ -225,7 +225,7 @@ class YandexMarketXML
             if($p->currency_id){
                 $data['currencyId'] = $this->currencies[$p->currency_id]['iso'];
             }else{
-                $data['currencyId'] = $this->currencies[Yii::$app->currency->main->id]['iso'];
+                $data['currencyId'] = $this->currencies[Yii::$app->currency->main['id']]['iso'];
             }
 
 
