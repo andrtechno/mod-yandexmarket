@@ -83,6 +83,8 @@ class YandexMarketXML
             if (!YII_DEBUG)
                 $cache->set($this->cacheFileName, true, $this->cacheTimeout);
         }
+
+
         header("content-type: text/xml");
         echo file_get_contents($this->getXmlFileFullPath());
         exit;
